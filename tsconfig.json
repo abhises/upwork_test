@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "ES6",
     "module": "commonjs",
-    "strict": true,
+    "moduleResolution": "node",
     "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "skipLibCheck": true
-  }
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }
