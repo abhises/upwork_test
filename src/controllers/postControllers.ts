@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../prisma";
+import { createPostSchema } from "../validators/postValidator"; // Adjust the import path
 
 export const createPost = async (req: Request, res: Response) => {
   const { title, description } = req.body;
