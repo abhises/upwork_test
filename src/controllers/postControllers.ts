@@ -1,12 +1,26 @@
 import { Request, Response } from "express";
+import { postSchema } from "../schemas/postSchema";
 import prisma from "../prisma";
-import { createPostSchema } from "../validators/postValidator"; // Adjust the import path
 
-export const createPost = async (req: Request, res: Response) => {
-  const { title, description } = req.body;
+export const createPost = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const parseResult = postSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    res.status(400).json({
+      error: "Validation failed",
+      details: parseResult.error.errors,
+    });
+    return;
+  }
+
+  const { title, description } = parseResult.data;
+
   try {
     const post = await prisma.post.create({ data: { title, description } });
-    res.json(post);
+    res.status(201).json(post); // fixed order: set status first, then json
   } catch (error) {
     res.status(500).json({ error: "Failed to create post" });
   }
@@ -23,16 +37,30 @@ export const getPostById = async (req: Request, res: Response) => {
   post ? res.json(post) : res.status(404).json({ error: "Post not found" });
 };
 
-export const updatePost = async (req: Request, res: Response) => {
+export const updatePost = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { id } = req.params;
-  const { title, description } = req.body;
+  const parseResult = postSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    res.status(400).json({
+      error: "Validation failed",
+      details: parseResult.error.errors,
+    });
+    return;
+  }
+
+  const { title, description } = parseResult.data;
+
   try {
     const post = await prisma.post.update({
       where: { id: Number(id) },
       data: { title, description },
     });
-    res.json(post);
-  } catch {
+    res.status(200).json(post);
+  } catch (error) {
     res.status(404).json({ error: "Post not found or update failed" });
   }
 };
